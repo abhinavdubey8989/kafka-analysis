@@ -7,3 +7,12 @@
 
 *.txt
 *.log
+
+dependencies/volumns/kafka/data/*
+dependencies/volumns/kafka/log/*
+dependencies/volumns/kafka/logs/*
+
+
+dependencies/volumns/zookeeper/data/*
+dependencies/volumns/zookeeper/log/*
+dependencies/volumns/kazookeeperfka/logs/*

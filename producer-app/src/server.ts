@@ -33,10 +33,6 @@ const userController = new UserController();
 const logService = LogService.getInstance();
 
 app.post('/user', async (req: Request, res: Response) => await userController.addUser(req, res));
-app.put('/user/:userId', async (req: Request, res: Response) => await userController.updateUser(req, res));
-app.get('/users', async (req: Request, res: Response) => await userController.getAllUsers(req, res));
-app.put('/incr-count-user/:userId/:txnFlag', async (req: Request, res: Response) => await userController.updateUserCount(req, res));
-
 
 app.listen(port, async () => {
     logService.info({} , `server started on port=[${port}] , server-id=[${process.env.SERVER_ID}]`);
