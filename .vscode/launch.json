@@ -4,12 +4,24 @@
       {
         "type": "node",
         "request": "launch",
-        "name": "debug server",
+        "name": "debug producer",
         "skipFiles": [
           "<node_internals>/**"
         ],
         "runtimeArgs": ["-r", "./producer-app/node_modules/ts-node/register"],
         "args": ["${workspaceFolder}/producer-app/src/server.ts"],
+        "sourceMaps": true,
+        "protocol": "inspector"
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "debug consumer",
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "runtimeArgs": ["-r", "./consumer-app/node_modules/ts-node/register"],
+        "args": ["${workspaceFolder}/consumer-app/src/server.ts"],
         "sourceMaps": true,
         "protocol": "inspector"
       }

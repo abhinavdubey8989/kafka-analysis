@@ -12,19 +12,18 @@ services:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_SERVERS: my_zk:2888:3888
     volumes:
-      - ./volumns/zookeeper/data:/var/lib/zookeeper/data
-      - ./volumns/zookeeper/log:/var/lib/zookeeper/log
+      - ./volumns/zookeeper:/var/lib/zookeeper
 
-  my_kafka:
+  my_kafka_1:
     image: confluentinc/cp-kafka:7.3.2
-    hostname: my_kafka
-    container_name: my_kafka
+    hostname: my_kafka_1
+    container_name: my_kafka_1
     ports:
       - "9092:9092"
       - "29092:29092"
-      - "9999:9999"
+      # - "9991:9999"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://my_kafka:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://my_kafka_1:9092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9093,DOCKER://host.docker.internal:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_ZOOKEEPER_CONNECT: "my_zk:2181"
@@ -33,35 +32,92 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_JMX_PORT: 9999
-      KAFKA_JMX_HOSTNAME: ${DOCKER_HOST_IP:-127.0.0.1}
+      # KAFKA_JMX_PORT: 9999
+      # KAFKA_JMX_HOSTNAME: ${DOCKER_HOST_IP:-127.0.0.1}
       KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
     depends_on:
       - my_zk
     volumes:
-      - ./volumns/kafka/data:/var/lib/kafka/data
-      - ./volumns/kafka/log:/var/lib/kafka/log
+      - ./volumns/kafka-1:/var/lib/kafka
+      - ./volumns/kafka-1/stats.txt:/stats.txt
+
+  my_kafka_2:
+    image: confluentinc/cp-kafka:7.3.2
+    hostname: my_kafka_2
+    container_name: my_kafka_2
+    ports:
+      - "9094:9094"
+      - "29093:29092"
+      # - "9992:9999"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://my_kafka_2:9094,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9095,DOCKER://host.docker.internal:29093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "my_zk:2181"
+      KAFKA_BROKER_ID: 2
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      # KAFKA_JMX_PORT: 9999
+      # KAFKA_JMX_HOSTNAME: ${DOCKER_HOST_IP:-127.0.0.1}
+      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+    depends_on:
+      - my_zk
+    volumes:
+      - ./volumns/kafka-2:/var/lib/kafka
+
+  my_kafka_3:
+    image: confluentinc/cp-kafka:7.3.2
+    hostname: my_kafka_3
+    container_name: my_kafka_3
+    ports:
+      - "9096:9096"
+      - "29094:29092"
+      # - "9994:9999"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://my_kafka_3:9096,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9097,DOCKER://host.docker.internal:29094      
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "my_zk:2181"
+      KAFKA_BROKER_ID: 3
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      # KAFKA_JMX_PORT: 9999
+      # KAFKA_JMX_HOSTNAME: ${DOCKER_HOST_IP:-127.0.0.1}
+      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+    depends_on:
+      - my_zk
+    volumes:
+      - ./volumns/kafka-3:/var/lib/kafka
+      - ./volumns/kafka-3/stats.txt:/stats.txt
+
+
 
   # this is UI for zookeeper : http://localhost:9000
-  zoo_ui: 
-    image: elkozmon/zoonavigator:latest
-    container_name: zoo_ui
-    hostname: zoo_ui
-    restart: always
-    ports:
-      - 9000:9000
-    environment:
-      HTTP_PORT: 9000
+  # zoo_ui: 
+  #   image: elkozmon/zoonavigator:latest
+  #   container_name: zoo_ui
+  #   hostname: zoo_ui
+  #   restart: always
+  #   ports:
+  #     - 9000:9000
+  #   environment:
+  #     HTTP_PORT: 9000
 
   # this is UI for kafka : http://localhost:9100
-  kafka_ui:
-    container_name: kafka_ui
-    hostname: kafka_ui
-    image: provectuslabs/kafka-ui:latest
-    ports:
-      - 9100:8080
-    environment:
-      DYNAMIC_CONFIG_ENABLED: 'true'
+  # kafka_ui:
+  #   container_name: kafka_ui
+  #   hostname: kafka_ui
+  #   image: provectuslabs/kafka-ui:latest
+  #   ports:
+  #     - 9100:8080
+  #   environment:
+  #     DYNAMIC_CONFIG_ENABLED: 'true'
 
 

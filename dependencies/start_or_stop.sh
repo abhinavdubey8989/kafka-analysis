@@ -1,16 +1,19 @@
 
 
-# this script will start/stop the component basis START_OR_STOP_FLAG 
-#       - (0-> stop , 1-> start) , 
-#       - this is the 1st arg
-#       - any other value of this flag is invalid
-# to start in attach or detach mode , pass ATTACH_MODE_FLAG
-#       - (a-> attach , d-> detach) , 
-#       - this is the 2nd arg
-#       - any other value of this flag is invalid
+# Aim : this script will start/stop the component basis START_OR_STOP_FLAG 
+#           - 0-> stop all containers
+#           - 1-> stop all , then start all
+#           - this is the 1st arg
+#           - any other value of this flag is invalid
+#
+#       to start in attach or detach mode , pass ATTACH_MODE_FLAG
+#           - (a-> attach , d-> detach) , 
+#           - this is the 2nd arg
+#           - any other value of this flag is invalid
+#
 # sample usage : 
-#       - "./start_or_stop 1 a"  (will start in attach mode)
-#       - "./start_or_stop 1" or "./start_or_stop 1 d"     (will start in detach mode)
+#       - "./start_or_stop 1 a"  (will stop all containers , then start in attach mode)
+#       - "./start_or_stop 1" or "./start_or_stop 1 d"     (will stop all containers , then will start in detach mode)
 #       - "./start_or_stop 0"     (will stop the container)
 
 

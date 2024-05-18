@@ -19,8 +19,8 @@ export class KafkaProducer {
         const serverId = process.env.SERVER_ID || `server_${os.hostname()}`;
 
         this.kafka = new Kafka({
-            clientId: 'my-app',
-            brokers: ['localhost:9092']
+            clientId: process.env.APP_NAME,
+            brokers: process.env.KAFKA_BROKER_STR!.split(',')
         });
         this.producer = this.kafka.producer();
         this.producer.connect();
@@ -43,11 +43,13 @@ export class KafkaProducer {
 
     public async send(ctx: Ctx, topic: string, message: any): Promise<void> {
         try {
+            message = {logId : ctx.logId! , ...message}
             const record: ProducerRecord = {
                 topic,
                 messages: [{ value: JSON.stringify(message) }],
             };
             await this.producer.send(record);
+            this.logService.info(ctx , `sent msg to topic [${topic}]`)
         } catch (e) {
             this.logService.error(ctx, JSON.stringify(e));
         }

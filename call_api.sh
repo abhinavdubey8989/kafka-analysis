@@ -6,5 +6,6 @@ curl --location "http://localhost:3033/user" \
     --data '{
         "id": 1,
         "name": "user-1",
-        "count": 1
+        "count": 1,
+        "topic":"xyz"
     }'
