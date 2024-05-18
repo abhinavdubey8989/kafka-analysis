@@ -1,0 +1,9 @@
+
+**/node_modules/
+
+**/dist/
+**/dist2/
+**/logs/
+
+*.txt
+*.log
