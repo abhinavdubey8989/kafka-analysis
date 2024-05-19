@@ -1,7 +1,7 @@
 
 
 
-# Aim : the aim of this script is to all an API exposed by producer-app to publish data "n" times to a topic
+# Aim : calls an API exposed by producer-app to publish data "n" times to a topic
 # sample-usage : ./<name-of-this-file>.sh 7
 #               - this will publish data 7 times by calling the API 7 times
 
