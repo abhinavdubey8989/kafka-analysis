@@ -4,9 +4,6 @@ import { Ctx } from '../utils/ctx';
 import { KafkaConsumer } from '../consumer_grp/kafkaConsumer.service';
 import { Request, Response } from 'express';
 
-//  
-//
-
 export class ConsumerGroupManager {
 
     private consumerGroupMap: Map<string, KafkaConsumer>;

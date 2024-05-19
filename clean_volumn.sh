@@ -1,5 +1,6 @@
 
-
+# Aim : the aim of this script is to clear the docker-container volumn data
+# sample-usage : ./<name-of-this-file>.sh
 
 
 # zookeeper

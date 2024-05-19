@@ -1,8 +1,7 @@
 
 
 import { Ctx } from './utils/ctx';
-import os from 'os';
-import { Kafka, Consumer, Admin } from 'kafkajs';
+import { Kafka, Admin } from 'kafkajs';
 import { LogService } from './utils/logService';
 
 
@@ -18,9 +17,16 @@ export interface ConsumerGroupOffsetMap {
     [consumerGroup: string]: TopicOffsetMap;
 }
 
-export interface ConsumerGroupWiseLagMap {
-    [consumerGroup: string]: { [topic: string]: number };
-}
+// export interface ConsumerGroupWiseData {
+//     state: string;
+//     memberCount: number;
+//     totalLag: number;
+//     topics: any;
+// }
+
+// export interface ConsumerGroupWiseLagMap {
+//     [consumerGroup: string]: ConsumerGroupWiseData;
+// }
 
 export interface TopicWiseLagMap {
     [topic: string]: number;
@@ -61,7 +67,6 @@ export class Service {
         // Get topic offsets
         const topicOffsetMap: TopicOffsetMap = {};
         const topics = await this.kafkaAdmin.listTopics();
-
         for (const topic of topics) {
             if (topic === '__consumer_offsets') {
                 continue;
@@ -89,18 +94,28 @@ export class Service {
         }
 
         // consumer-group-wise lag
+        // @TO-DO : use "ConsumerGroupWiseLagMap" instead of "any"
         const consumerGroupNames = Object.keys(consumerGroupOffsetMap);
-        const consumerWiseLag: ConsumerGroupWiseLagMap = {}
+        const { groups: groupsDetails } = await this.kafkaAdmin.describeGroups(consumerGroupNames);
+        const consumerWiseLag: any = {};
         for (const cg of consumerGroupNames) {
-            consumerWiseLag[cg] = {}
+            const grpDetail = groupsDetails.find(x => x.groupId === cg);
+            const { members, state } = grpDetail!;
+            consumerWiseLag[cg] = { memberCount: members.length, state, topicWiseLag: {}, totalLag: 0 };
+
+            let totalLagForGroup = 0;
+            const topicWiseLag = {} as any
             const topicMapOfThisGroup = consumerGroupOffsetMap[cg];
             const topicsOfThisGroup = Object.keys(topicMapOfThisGroup);
             for (const topic of topicsOfThisGroup) {
                 const consumerTopicData = topicMapOfThisGroup[topic];
                 const topicData = topicOffsetMap[topic];
                 const diff = this.getDiff(topicData, consumerTopicData);
-                consumerWiseLag[cg][topic] = diff
+                topicWiseLag[topic] = diff;
+                totalLagForGroup += diff;
             }
+            consumerWiseLag[cg].totalLagForGroup = totalLagForGroup;
+            consumerWiseLag[cg].topicWiseLag = topicWiseLag;
         }
 
         // topic-wise lag
@@ -116,7 +131,6 @@ export class Service {
                 }
                 lag += this.getDiff(topicOffsetMap[topic], consumerDataForThisTopic);
             }
-
             topicWiseLagMap[topic] = lag;
         }
 
@@ -125,8 +139,8 @@ export class Service {
         return {
             // topicOffsetMap,
             // consumerGroupOffsetMap,
-            consumerWiseLag,
-            topicWiseLagMap
+            topicWiseLagMap,
+            consumerWiseLag
         };
     }
 
