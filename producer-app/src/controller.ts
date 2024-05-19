@@ -16,9 +16,9 @@ export class UserController {
 
     async addUser(req: Request, res: Response) {
         const ctx: Ctx = res.locals.ctx;
-        const { id, name, count , topic } = req.body;
+        const { id, name, count, topic } = req.body;
         const user = { id, name, count };
-        await this.kafkaProducer.send(ctx , topic , user);
-        res.status(201).json({ logId: ctx.logId, data: `User updated successfully` });
+        await this.kafkaProducer.send(ctx, topic, user);
+        res.status(201).json({ logId: ctx.logId, data: {} });
     }
 }

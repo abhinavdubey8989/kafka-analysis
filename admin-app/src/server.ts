@@ -8,7 +8,7 @@ const randomId = require('random-id');
 // load configs
 import { config } from 'dotenv';
 import ENV_DIR from './config/envDir';
-import { ConsumerGroupManager } from './consumer_grp_manager/consumer.manager';
+import { Controller } from './controller';
 const path = require('path')
 config({ path: path.resolve(__dirname, ENV_DIR) });
 
@@ -29,14 +29,11 @@ const requestIdMiddleware = (req: Request, res: Response, next: NextFunction) =>
 const app = express();
 app.use(requestIdMiddleware);
 app.use(bodyParser.json());
-const consumerGroupManager = new ConsumerGroupManager();
+const controller = new Controller();
 const logService = LogService.getInstance();
 
-app.post('/consumer-groups', async (req: Request, res: Response) => await consumerGroupManager.addConsumerGroups(req, res));
-app.get('/consumer-groups', async (req: Request, res: Response) => await consumerGroupManager.getConsumerGroups(req, res));
-app.delete('/consumer-groups', async (req: Request, res: Response) => await consumerGroupManager.deleteConsumerGroups(req, res));
 
-
+app.get('/admin', async (req: Request, res: Response) => await controller.getAdminStats(req, res));
 app.listen(port, async () => {
     logService.info({} , `server started on port=[${port}] , server-id=[${process.env.SERVER_ID}]`);
 });

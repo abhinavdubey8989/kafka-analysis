@@ -1,32 +1,33 @@
 
 
-# list tpc
+# list topic
 /bin/kafka-topics --list --bootstrap-server localhost:9092
 
-# descibe tpc
+# descibe topic
 /bin/kafka-topics --describe --bootstrap-server localhost:9092 --topic <>
 /bin/kafka-topics --describe --bootstrap-server localhost:9092 --topic "t3"
 
-# create tpc
+# create topic
 /bin/kafka-topics --create --bootstrap-server localhost:9092 --topic <> --partitions <> --replication-factor <>
-/bin/kafka-topics --create --bootstrap-server localhost:9092 --topic "t1" --partitions 1 --replication-factor 1
 /bin/kafka-topics --create --bootstrap-server localhost:9092 --topic "t3" --partitions 3 --replication-factor 3
 
 
-# delete tpc
+# delete topic
 /bin/kafka-topics --bootstrap-server localhost:9092 --delete --topic <> --if-exists
-/bin/kafka-topics --bootstrap-server localhost:9092 --delete --topic "t1" --if-exists
+/bin/kafka-topics --bootstrap-server localhost:9092 --delete --topic "t3" --if-exists
 
 
-# list cnsmr grps
+# list all consumer groups
 /bin/kafka-consumer-groups --bootstrap-server localhost:9092 --list
 
-
-# list consumer groups
+# describe all consumer groups
 /bin/kafka-consumer-groups --bootstrap-server localhost:9092 --describe --all-groups
 
+# describe 1 consumer group
+/bin/kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group "cg1"
+
 # delete consumer group
-/bin/kafka-consumer-groups --bootstrap-server localhost:9092 --delete --group "cnsmr_gp_1"
+/bin/kafka-consumer-groups --bootstrap-server localhost:9092 --delete --group "cg1"
 
 # get consumer group state (stable/empty)
 /bin/kafka-consumer-groups --bootstrap-server localhost:9092 --describe --all-groups --state
