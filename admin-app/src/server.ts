@@ -33,7 +33,7 @@ const controller = new Controller();
 const logService = LogService.getInstance();
 
 
-app.get('/admin', async (req: Request, res: Response) => await controller.getAdminStats(req, res));
+app.post('/kafka-admin', async (req: Request, res: Response) => await controller.getAdminStats(req, res));
 app.listen(port, async () => {
     logService.info({} , `server started on port=[${port}] , server-id=[${process.env.SERVER_ID}]`);
 });

@@ -19,7 +19,7 @@ export class Controller {
 
     async getAdminStats(req: Request, res: Response) {
         const ctx: Ctx = res.locals.ctx;
-        const stats: any = await this.service.getLagDetails(ctx);
+        const stats: any = await this.service.getLagDetails(ctx , req.body);
         res.status(200).json({ logId: ctx.logId, data: stats });
     }
 

@@ -3,6 +3,8 @@
 import { Ctx } from './utils/ctx';
 import { Kafka, Admin } from 'kafkajs';
 import { LogService } from './utils/logService';
+import { StatsDService } from './utils/statsd.service';
+const SDC = require('statsd-client');
 
 
 export interface TopicMap {
@@ -38,10 +40,12 @@ export class Service {
     private kafka: Kafka;
     private logService: LogService;
     private kafkaAdmin: Admin;
+    private statsDService: StatsDService;
 
 
     constructor() {
         this.logService = LogService.getInstance();
+        this.statsDService = StatsDService.getInstance();
         try {
             const brokers = process.env.KAFKA_BROKER_STR!.split(',')
             this.kafka = new Kafka({
@@ -50,6 +54,9 @@ export class Service {
             });
             this.kafkaAdmin = this.kafka.admin();
             this.kafkaAdmin.connect();
+
+            // this.kafkaAdmin.describeGroup
+
         } catch (e) {
             console.log(JSON.stringify(e));
             this.kafka = {} as any;
@@ -62,7 +69,8 @@ export class Service {
         await this.kafkaAdmin.disconnect();
     }
 
-    async getLagDetails(ctx: Ctx): Promise<any> {
+    async getLagDetails(ctx: Ctx , body:any): Promise<any> {
+        this.logService.info(ctx , `called kafka-admin-api`);
 
         // Get topic offsets
         const topicOffsetMap: TopicOffsetMap = {};
@@ -101,7 +109,7 @@ export class Service {
         for (const cg of consumerGroupNames) {
             const grpDetail = groupsDetails.find(x => x.groupId === cg);
             const { members, state } = grpDetail!;
-            consumerWiseLag[cg] = { memberCount: members.length, state, topicWiseLag: {}, totalLag: 0 };
+            consumerWiseLag[cg] = { memberCount: members.length, state, topicWiseLag: {}, totalLagForGroup: 0 };
 
             let totalLagForGroup = 0;
             const topicWiseLag = {} as any
@@ -136,12 +144,18 @@ export class Service {
 
 
 
-        return {
-            // topicOffsetMap,
-            // consumerGroupOffsetMap,
+        const returnData = {
             topicWiseLagMap,
             consumerWiseLag
         };
+
+        // if send metric is true then only send the metrics
+        // we dont want to send metrics when called via postman 
+        if(body && body.sendMetric){
+            this.statsDService.sendKafkaMetrics(ctx, returnData);
+        }
+
+        return returnData;
     }
 
 

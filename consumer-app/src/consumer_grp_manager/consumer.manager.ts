@@ -6,15 +6,13 @@ import { Request, Response } from 'express';
 
 export class ConsumerGroupManager {
 
-    private consumerGroupMap: Map<string, KafkaConsumer>;
+    private consumerGroupMap: Map<string, KafkaConsumer[]>;
     private logService: LogService;
 
     constructor() {
         this.logService = LogService.getInstance();
-        this.consumerGroupMap = new Map<string, KafkaConsumer>();
+        this.consumerGroupMap = new Map<string, KafkaConsumer[]>();
     }
-
-
 
     async addConsumerGroups(req: Request, res: Response) {
         const ctx: Ctx = res.locals.ctx;
@@ -22,38 +20,62 @@ export class ConsumerGroupManager {
         const addedConsumerGroups: string[] = [];
 
         for (const newConsumer of newConsumers) {
-            const { groupId, topicsToRead, sleepSeconds } = newConsumer as any;
-            // if (this.consumerGroupMap.has(groupId)) {
-            //     continue;
-            // }
+            const { groupId, topicsToRead, sleepSeconds, allowMultiple } = newConsumer as any;
+            if (this.consumerGroupMap.has(groupId) && !allowMultiple) {
+                continue;
+            }
+
+            if (!this.consumerGroupMap.has(groupId)) {
+                this.consumerGroupMap.set(groupId, []);
+            }
+
             const newConsumerGroup = new KafkaConsumer(groupId, topicsToRead, sleepSeconds);
-            this.consumerGroupMap.set(groupId, newConsumerGroup);
+            this.consumerGroupMap.get(groupId)!.push(newConsumerGroup);
             addedConsumerGroups.push(groupId);
         }
-        res.status(201).json({ logId: ctx.logId, data: { addedConsumerGroups } });
+        const data = await this.getConsumerGroups(req, res, true);
+        res.status(201).json({ logId: ctx.logId, data });
     }
 
 
     async deleteConsumerGroups(req: Request, res: Response) {
         const ctx: Ctx = res.locals.ctx;
-        const { newConsumers } = req.body;
+        const { listOfConsumerGroupToRemove } = req.body;
         const deletedConsumerGroups: string[] = [];
-        for (const newConsumer of newConsumers) {
-            const { groupId } = newConsumer as any;
-            if (!this.consumerGroupMap.has(groupId)) {
+
+        for (const cgToRemove of listOfConsumerGroupToRemove) {
+            if (!this.consumerGroupMap.has(cgToRemove)) {
                 continue;
             }
-            const existingConsumerGroup = this.consumerGroupMap.get(groupId);
-            existingConsumerGroup!.disconnect();
-            deletedConsumerGroups.push(groupId);
+            const cgList = this.consumerGroupMap.get(cgToRemove);
+            for (const cg of cgList!) {
+                cg.disconnect();
+            }
+            deletedConsumerGroups.push(cgToRemove);
         }
-        res.status(200).json({ logId: ctx.logId, data: { deletedConsumerGroups } });
+
+        const data = await this.getConsumerGroups(req, res, true);
+        res.status(200).json({ logId: ctx.logId, data });
     }
 
-    async getConsumerGroups(req: Request, res: Response) {
+    async getConsumerGroups(req: Request, res: Response, internal: boolean = false) {
         const ctx: Ctx = res.locals.ctx;
-        const currentConsumerGroups: string[] = Array.from(this.consumerGroupMap.keys());
-        res.status(200).json({ logId: ctx.logId, data: { currentConsumerGroups } });
+        const data: any = {};
+        const cgList = Array.from(this.consumerGroupMap.keys());
+        for (const cg of cgList) {
+            const listOfConsumers = this.consumerGroupMap.get(cg) || [];
+            data[cg] = {
+                size: listOfConsumers.length,
+            }
+        }
+
+        // return val
+        if (internal) {
+            return data;
+        } else {
+            res.status(200).json({ logId: ctx.logId, data });
+        }
+
     }
 
 }

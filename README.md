@@ -41,7 +41,7 @@ The monitoring app or scripts will scrape data from kafka cluster
     - these consumer-grps are kept inside a map itself (not in DB)
 
 - The admin-app 
-    - exposes an endpoint `/admin`
+    - exposes an endpoint `/kafka-admin`
     - which can be scraped periodically or can be called periodically to send data to graphite via statsd & then visualised in grafana 
 
 

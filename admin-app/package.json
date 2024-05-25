@@ -35,6 +35,7 @@
     "pg": "^8.11.4",
     "random-id": "^1.0.4",
     "redis": "^4.6.13",
+    "statsd-client": "^0.4.7",
     "winston": "^3.13.0",
     "zookeeper": "^6.1.1"
   }

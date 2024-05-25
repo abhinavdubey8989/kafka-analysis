@@ -18,7 +18,11 @@ fi
 
 # Iterate using for loop
 for (( i=1; i<=$TIMES; i++ )); do
-    curl --location "http://localhost:3033/user" \
+
+    # this curl will NOT put response of api on console
+    # "-s" : stand for silent mode
+    # "-o /dev/null" :  specifies the output file , which here is null
+    curl -s -o /dev/null --location "http://localhost:3033/user" \
         --header 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
         --header 'Content-Type: application/json' \
         --data '{
@@ -28,5 +32,5 @@ for (( i=1; i<=$TIMES; i++ )); do
             "topic":"t3"
         }'
 
-    echo "called API : $i out of $TIMES"
+    # echo "called API : $i out of $TIMES"
 done
