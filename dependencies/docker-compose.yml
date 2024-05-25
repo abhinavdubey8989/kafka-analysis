@@ -99,25 +99,25 @@ services:
 
 
 
-  # this is UI for zookeeper : http://localhost:9000
-  # zoo_ui: 
-  #   image: elkozmon/zoonavigator:latest
-  #   container_name: zoo_ui
-  #   hostname: zoo_ui
-  #   restart: always
-  #   ports:
-  #     - 9000:9000
-  #   environment:
-  #     HTTP_PORT: 9000
+  # check readme for more details of zoo_ui
+  zoo_ui: 
+    image: elkozmon/zoonavigator:latest
+    container_name: zoo_ui
+    hostname: zoo_ui
+    restart: always
+    ports:
+      - 9000:9000
+    environment:
+      HTTP_PORT: 9000
 
-  # this is UI for kafka : http://localhost:9100
-  # kafka_ui:
-  #   container_name: kafka_ui
-  #   hostname: kafka_ui
-  #   image: provectuslabs/kafka-ui:latest
-  #   ports:
-  #     - 9100:8080
-  #   environment:
-  #     DYNAMIC_CONFIG_ENABLED: 'true'
+  # check readme for more details of kafka_ui
+  kafka_ui:
+    container_name: kafka_ui
+    hostname: kafka_ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 9100:8080
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
 
 

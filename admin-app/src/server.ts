@@ -34,6 +34,8 @@ const logService = LogService.getInstance();
 
 
 app.post('/kafka-admin', async (req: Request, res: Response) => await controller.getAdminStats(req, res));
+app.delete('/delete-groups', async (req: Request, res: Response) => await controller.deleteConsumerGroups(req, res));
+
 app.listen(port, async () => {
     logService.info({} , `server started on port=[${port}] , server-id=[${process.env.SERVER_ID}]`);
 });

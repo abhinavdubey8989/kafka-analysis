@@ -85,3 +85,14 @@ The monitoring app or scripts will scrape data from kafka cluster
 
 # get consumer group state (stable/empty)
 - /bin/kafka-consumer-groups --bootstrap-server localhost:9092 --describe --all-groups --state
+
+
+# Zookpeer ui
+- link : http://localhost:9000
+- connection-string : host.docker.internal:2181 (this port is host-machine port)
+- Auth-username & Auth-password can be anything
+
+# Kafka ui 
+- link : http://localhost:9100/ui/clusters/create-new-cluster
+- host string : my_kafka_1 (or my_kafka_2 or my_kafka_3)
+- port : 9092 (or 9094 or 9096)

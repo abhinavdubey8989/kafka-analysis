@@ -1,7 +1,7 @@
 
 
 import { Ctx } from './utils/ctx';
-import { Kafka, Admin } from 'kafkajs';
+import { Kafka, Admin, PartitionOffset } from 'kafkajs';
 import { LogService } from './utils/logService';
 import { StatsDService } from './utils/statsd.service';
 const SDC = require('statsd-client');
@@ -54,14 +54,10 @@ export class Service {
             });
             this.kafkaAdmin = this.kafka.admin();
             this.kafkaAdmin.connect();
-
-            // this.kafkaAdmin.describeGroup
-
         } catch (e) {
             console.log(JSON.stringify(e));
             this.kafka = {} as any;
             this.kafkaAdmin = {} as any;
-
         }
     }
 
@@ -69,8 +65,8 @@ export class Service {
         await this.kafkaAdmin.disconnect();
     }
 
-    async getLagDetails(ctx: Ctx , body:any): Promise<any> {
-        this.logService.info(ctx , `called kafka-admin-api`);
+    async getLagDetails(ctx: Ctx, body: any): Promise<any> {
+        this.logService.info(ctx, `called kafka-admin-api`);
 
         // Get topic offsets
         const topicOffsetMap: TopicOffsetMap = {};
@@ -151,7 +147,7 @@ export class Service {
 
         // if send metric is true then only send the metrics
         // we dont want to send metrics when called via postman 
-        if(body && body.sendMetric){
+        if (body && body.sendMetric) {
             this.statsDService.sendKafkaMetrics(ctx, returnData);
         }
 
@@ -168,4 +164,46 @@ export class Service {
         }
         return res;
     }
+
+
+    async deleteConsumerGroups(ctx: Ctx, body: any): Promise<any> {
+        try {
+            const groups = body.listOfConsumerGroupToRemove;
+            const groupsToDelete: string[] = [];
+            for (const cgName of groups) {
+                const offsets = await this.kafkaAdmin.fetchOffsets({ groupId: cgName });
+                const {groups} = await this.kafkaAdmin.describeGroups([cgName]);
+                for(const g of groups){
+                    g
+                }
+
+                if (!offsets || !offsets.length) {
+                    continue;
+                }
+
+                groupsToDelete.push(cgName);
+
+                const topicsOfThisCg = offsets.map(x => x.topic);
+                for (const topic of topicsOfThisCg) {
+                    const partionCount = offsets.find(x => x.topic === topic)!.partitions.length;
+                    const finalPartitionList: PartitionOffset[] = [];
+                    for (let i = 0; i < partionCount; i++) {
+                        finalPartitionList.push({ offset: `${i}`, partition: -1 })
+                    }
+                    await this.kafkaAdmin.setOffsets({
+                        groupId: cgName,
+                        topic,
+                        partitions: finalPartitionList
+                    });
+                }
+            }
+
+            if (groupsToDelete.length > 0) {
+                await this.kafkaAdmin.deleteGroups(groupsToDelete);
+            }
+            return groupsToDelete;
+        } catch (error) {
+            this.logService.error(ctx, JSON.stringify(error))
+        }
+    };
 }
