@@ -25,9 +25,12 @@ The monitoring app or scripts will scrape data from kafka cluster
 
 
 # How to
+- start the monitoring dependencies : statsd , graphite , grafana (run `init_monitoring_components.sh`)
 - start all kafka dependencies by running :  `start_or_stop.sh` inside `dependencies` dir
-- optionally start the monitoring dependencies : statsd , graphite , grafana
-- start the producer-app , consumer-app , admin-app
+- create topic(s) by going into kafka container
+- start the `producer-app` , `consumer-app` , `admin-app`
+- add a consumer group : by calling the api of `consumer-app`
+- start the scripts : `publish_msg_forever.sh` & `scrape_admin_data.sh`
 
 
 - The producer-app
