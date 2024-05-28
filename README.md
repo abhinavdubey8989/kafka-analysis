@@ -87,6 +87,11 @@ The monitoring app or scripts will scrape data from kafka cluster
 - /bin/kafka-consumer-groups --bootstrap-server localhost:9092 --describe --all-groups --state
 
 
+# kafka-console producer
+- echo '{"a": "a", "b": 2}' | /bin/kafka-console-producer --bootstrap-server localhost:9092 --topic t3
+
+
+
 # Zookpeer ui
 - link : http://localhost:9000
 - connection-string : host.docker.internal:2181 (this port is host-machine port)

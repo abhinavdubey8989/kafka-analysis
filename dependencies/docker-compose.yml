@@ -11,8 +11,8 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_SERVERS: my_zk:2888:3888
-    volumes:
-      - ./volumns/zookeeper:/var/lib/zookeeper
+    # volumes:
+    #   - ./volumns/zookeeper:/var/lib/zookeeper
 
   my_kafka_1:
     image: confluentinc/cp-kafka:7.3.2
@@ -38,9 +38,9 @@ services:
       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
     depends_on:
       - my_zk
-    volumes:
-      - ./volumns/kafka-1:/var/lib/kafka
-      - ./volumns/kafka-1/stats.txt:/stats.txt
+    # volumes:
+    #   - ./volumns/kafka-1:/var/lib/kafka
+    #   - ./volumns/kafka-1/stats.txt:/stats.txt
 
   my_kafka_2:
     image: confluentinc/cp-kafka:7.3.2
@@ -66,8 +66,8 @@ services:
       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
     depends_on:
       - my_zk
-    volumes:
-      - ./volumns/kafka-2:/var/lib/kafka
+    # volumes:
+    #   - ./volumns/kafka-2:/var/lib/kafka
 
   my_kafka_3:
     image: confluentinc/cp-kafka:7.3.2
@@ -93,9 +93,8 @@ services:
       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
     depends_on:
       - my_zk
-    volumes:
-      - ./volumns/kafka-3:/var/lib/kafka
-      - ./volumns/kafka-3/stats.txt:/stats.txt
+    # volumes:
+    #   - ./volumns/kafka-3:/var/lib/kafka
 
 
 
